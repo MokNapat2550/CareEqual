@@ -168,7 +168,7 @@ export default function LandingPage() {
       </section>
 
       <footer className="py-10 text-center opacity-30 mt-auto">
-        <p className="text-[10px] font-black uppercase tracking-[0.5em]">CareEqual &copy; 2026</p>
+        <p className="text-[10px] font-black uppercase tracking-[0.5em]">CareEqual</p>
       </footer>
     </div>
   );
