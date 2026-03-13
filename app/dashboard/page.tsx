@@ -45,13 +45,11 @@ export default function DashboardPage() {
   const [userRole, setUserRole] = useState<string>(""); 
   const [selectedPatient, setSelectedPatient] = useState<PatientData | null>(null);
   const [viewMode, setViewMode] = useState<'qr' | 'details'>('qr'); 
-  const [origin, setOrigin] = useState("");
   const [searchIdCard, setSearchIdCard] = useState("");
   const [isSearching, setIsSearching] = useState(false);
   const [searchError, setSearchError] = useState("");
 
   useEffect(() => {
-    setOrigin(window.location.origin);
     async function fetchData() {
       const userString = localStorage.getItem("user");
       if (!userString) {
@@ -271,7 +269,11 @@ export default function DashboardPage() {
                   <h3 className="text-xl font-black text-slate-800 mb-1">{selectedPatient.fullName}</h3>
                   <div className="p-6 bg-slate-50 rounded-[2.5rem] border-2 border-dashed border-slate-200 my-6">
                     <div id="qr-svg-container" className="bg-white p-4 rounded-3xl shadow-sm">
-                      <QRCode value={origin ? `${origin}/scan/${selectedPatient.qrToken}` : ""} size={200} level="H" />
+                      <QRCode 
+                        value={`${process.env.NEXT_PUBLIC_BASE_URL}/scan/${selectedPatient.qrToken}`} 
+                        size={200} 
+                        level="H" 
+                      />
                     </div>
                   </div>
                   <div className="grid grid-cols-2 gap-3 w-full">
@@ -355,7 +357,11 @@ export default function DashboardPage() {
                         <p className="text-xs font-black uppercase tracking-widest">Careequal Patient QR</p>
                       </div>
                       <div id="qr-svg-container" className="bg-white p-5 rounded-3xl shadow-xl border-4 border-white mb-6">
-                        <QRCode value={origin ? `${origin}/scan/${selectedPatient.qrToken}` : ""} size={160} level="H" />
+                        <QRCode 
+                          value={`${process.env.NEXT_PUBLIC_BASE_URL}/scan/${selectedPatient.qrToken}`} 
+                          size={160} 
+                          level="H" 
+                        />
                       </div>
                       
                       <div className="grid grid-cols-2 gap-4 w-full">
