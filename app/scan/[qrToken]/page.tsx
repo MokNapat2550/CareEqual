@@ -2,7 +2,7 @@ import { prisma } from "@/lib/prisma";
 import { 
   Activity, Droplet, User, Phone, Pill, 
  HeartPulse, ShieldAlert, MapPin, IdCard, 
-  ChevronLeft , BookHeart
+  ChevronLeft , Heart, BookHeart
 } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import Link from "next/link";
@@ -114,7 +114,7 @@ export default async function EmergencyProfilePage({ params }: { params: Promise
             </Card>
             <Card className="border-none shadow-xl rounded-[2.5rem] bg-white overflow-hidden hover:shadow-2xl transition-shadow">
               <CardContent className="p-5 flex flex-col items-center justify-center text-center h-full">
-                <Activity size={32} className="text-blue-500 mb-2" />
+                <Heart size={32} className="text-blue-500 mb-2" />
                 <p className="text-[10px] md:text-xs font-black text-slate-400 uppercase tracking-widest">อายุ / เพศ</p>
                 <p className="text-xl md:text-2xl font-black text-slate-800 mt-2">{patient.age} ปี<br/><span className="text-lg text-slate-500">{patient.gender}</span></p>
               </CardContent>
@@ -138,7 +138,7 @@ export default async function EmergencyProfilePage({ params }: { params: Promise
           <Card className="md:col-span-6 border-none shadow-xl rounded-[2.5rem] bg-white overflow-hidden">
             <CardContent className="p-7 space-y-6">
               <div className="flex gap-4">
-                <div className="p-3 md:p-4 bg-orange-50 text-orange-500 rounded-2xl h-fit shadow-sm"><Activity size={24} /></div>
+                <div className="p-3 md:p-4 bg-orange-50 text-orange-500 rounded-2xl h-fit shadow-sm"><BookHeart size={24} /></div>
                 <div>
                   <h3 className="font-black text-[11px] md:text-xs text-slate-400 uppercase tracking-widest mb-1">โรคประจำตัว</h3>
                   <p className="text-lg md:text-xl font-bold text-slate-800 leading-snug">{patient.underlying || "-"}</p>

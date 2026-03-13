@@ -9,7 +9,7 @@ import {
   PlusCircle, QrCode, Users, LogOut, Loader2, 
   Printer, ScanLine, Search, ShieldAlert, PhoneCall,
   IdCard, MapPin, UserIcon, ChevronLeft, HeartPulse,
-  Globe2, BookOpen, Activity, Droplet
+  Globe2, BookOpen, Pill, Droplet , Heart
 } from "lucide-react";
 import { getRecentPatients, getPatientByIdCard } from "@/app/actions/patient";
 import QRCode from "react-qr-code";
@@ -303,17 +303,17 @@ export default function DashboardPage() {
                   <div className="px-8 -mt-8 grid grid-cols-3 gap-3 z-20">
                     <Card className="mt-5 border-none shadow-xl rounded-[2rem] bg-white overflow-hidden text-center p-4">
                       <Droplet size={24} className="text-red-600 mx-auto mb-1" fill="currentColor" />
-                      <p className="text-[10px] font-black text-slate-400 uppercase tracking-tighter">Blood Type</p>
+                      <p className="text-[10px] font-black text-slate-400 uppercase tracking-tighter">กรุ๊ปเลือด</p>
                       <p className="text-2xl font-black text-red-600">{selectedPatient.bloodType || "-"}</p>
                     </Card>
                     <Card className="mt-5 border-none shadow-xl rounded-[2rem] bg-white overflow-hidden text-center p-4">
-                      <Activity size={24} className="text-blue-500 mx-auto mb-1" />
-                      <p className="text-[10px] font-black text-slate-400 uppercase tracking-tighter">Age</p>
+                      <Heart size={24} className="text-blue-500 mx-auto mb-1" />
+                      <p className="text-[10px] font-black text-slate-400 uppercase tracking-tighter">อายุ</p>
                       <p className="text-2xl font-black text-slate-800">{selectedPatient.age}</p>
                     </Card>
                     <Card className="mt-5 border-none shadow-xl rounded-[2rem] bg-white overflow-hidden text-center p-4">
                       <UserIcon size={24} className="text-emerald-500 mx-auto mb-1" />
-                      <p className="text-[10px] font-black text-slate-400 uppercase tracking-tighter">Gender</p>
+                      <p className="text-[10px] font-black text-slate-400 uppercase tracking-tighter">เพศ</p>
                       <p className="text-xl font-black text-slate-800">{selectedPatient.gender}</p>
                     </Card>
                   </div>
@@ -332,7 +332,6 @@ export default function DashboardPage() {
                         <p className="font-bold text-slate-800 leading-snug">{selectedPatient.underlying || "-"}</p>
                       </div>
                       <div className="bg-slate-50 p-5 rounded-[2rem] border border-slate-100">
-                        <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">ยาที่ใช้ประจำ</p>
                         <p className="font-bold text-slate-800 leading-snug">{selectedPatient.medications || "-"}</p>
                       </div>
                     </div>
