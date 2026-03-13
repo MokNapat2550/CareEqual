@@ -2,7 +2,7 @@ import { prisma } from "@/lib/prisma";
 import { 
   Activity, Droplet, User, Phone, Pill, 
  HeartPulse, ShieldAlert, MapPin, IdCard, 
-  ChevronLeft
+  ChevronLeft , BookHeart
 } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import Link from "next/link";
@@ -53,7 +53,7 @@ export default async function EmergencyProfilePage({ params }: { params: Promise
       </Link>
 
       {/* 🟦 Header ส่วนบน: จัด Layout ใหม่ให้รองรับจอใหญ่และสมดุลบนมือถือ */}
-      <div className="bg-red-300 w-full pt-20 md:pt-16 pb-28 md:pb-36 px-4 md:px-12 rounded-b-[3rem] md:rounded-b-[5rem] shadow-lg relative overflow-hidden flex justify-center">
+      <div className="bg-emerald-500 w-full pt-20 md:pt-16 pb-28 md:pb-36 px-4 md:px-12 rounded-b-[3rem] md:rounded-b-[5rem] shadow-lg relative overflow-hidden flex justify-center">
         {/* แสงวงกลมตกแต่ง */}
         <div className="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full -mr-20 -mt-20 blur-3xl pointer-events-none" />
         <div className="absolute bottom-0 left-0 w-40 h-40 bg-black/10 rounded-full -ml-10 -mb-10 blur-2xl pointer-events-none" />
@@ -122,7 +122,7 @@ export default async function EmergencyProfilePage({ params }: { params: Promise
           </div>
 
           {/* 🚨 ข้อมูลแพ้ยา */}
-          <Card className={`md:col-span-7 lg:col-span-8 border-none shadow-xl rounded-[2.5rem] overflow-hidden flex flex-col justify-center ${hasAllergies ? 'bg-red-600 text-white' : 'bg-emerald-500 text-white'}`}>
+          <Card className={`md:col-span-7 lg:col-span-8 border-none shadow-xl rounded-[2.5rem] overflow-hidden flex flex-col justify-center ${hasAllergies ? 'bg-red-600 text-white' : 'bg-red-500 text-white'}`}>
             <CardContent className="p-6 md:p-8 flex flex-col justify-center h-full">
               <div className="flex items-center gap-2 mb-3">
                 <ShieldAlert size={26} />
@@ -140,7 +140,7 @@ export default async function EmergencyProfilePage({ params }: { params: Promise
               <div className="flex gap-4">
                 <div className="p-3 md:p-4 bg-orange-50 text-orange-500 rounded-2xl h-fit shadow-sm"><Activity size={24} /></div>
                 <div>
-                  <h3 className="font-black text-[11px] md:text-xs text-slate-400 uppercase tracking-widest mb-1">โรคประจำตัว (Underlying)</h3>
+                  <h3 className="font-black text-[11px] md:text-xs text-slate-400 uppercase tracking-widest mb-1">โรคประจำตัว</h3>
                   <p className="text-lg md:text-xl font-bold text-slate-800 leading-snug">{patient.underlying || "-"}</p>
                 </div>
               </div>
