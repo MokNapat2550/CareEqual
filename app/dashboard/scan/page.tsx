@@ -12,7 +12,7 @@ export default function ScanPage() {
   const router = useRouter();
   const [hasPermission, setHasPermission] = useState<boolean | null>(null);
   
-  // 🟢 เพิ่มสถานะการสแกน: 'idle' | 'success' | 'error'
+  // 🟢 สถานะการสแกน: 'idle' | 'success' | 'error'
   const [scanStatus, setScanStatus] = useState<'idle' | 'success' | 'error'>('idle');
   
   const scannerRef = useRef<Html5Qrcode | null>(null);
@@ -35,29 +35,35 @@ export default function ScanPage() {
           { facingMode: "environment" },
           { fps: 10, qrbox: { width: 250, height: 250 }, aspectRatio: 1.0 },
           async (decodedText) => {
-            // หยุดสแกนชั่วคราวเพื่อเช็คข้อมูล
+            // หยุดสแกนชั่วคราว
             if (scannerRef.current?.isScanning) {
               await scannerRef.current.stop();
             }
 
-            // ✅ กรณีที่ 1: QR Code ถูกต้อง (มีคำว่า /scan/)
+            // ✅ กรณีที่ 1: QR Code ของระบบ CareEqual (ตรวจจาก /scan/)
             if (decodedText.includes('/scan/')) {
               setScanStatus('success');
               
-              // รอ 1.5 วินาทีให้คนดูว่าสำเร็จ แล้วค่อยไปหน้าข้อมูล
+              // 🛡️ [จุดสำคัญ] ระบบซ่อม URL อัตโนมัติ
+              let finalUrl = decodedText;
+              
+              // ถ้าสแกนเจอ localhost ให้เปลี่ยนเป็น URL ปัจจุบันที่กำลังใช้งาน (Vercel)
+              if (finalUrl.includes("localhost:3000")) {
+                const currentOrigin = window.location.origin; // จะได้ https://careequalqrcode.vercel.app
+                finalUrl = finalUrl.replace("http://localhost:3000", currentOrigin);
+                console.log("Redirecting from localhost to:", finalUrl);
+              }
+
+              // รอ 1.5 วินาทีเพื่อให้แสดงหน้าจอ Success
               setTimeout(() => {
-                window.location.href = decodedText;
+                window.location.href = finalUrl;
               }, 1500);
             } 
-            // ❌ กรณีที่ 2: QR Code ไม่ใช่ของระบบ CareEqual
+            // ❌ กรณีที่ 2: QR Code ไม่ใช่ของระบบ
             else {
               setScanStatus('error');
-              
-              // รอ 2 วินาทีเพื่อให้คนอ่าน Error แล้วรีเซ็ตกลับไปสแกนใหม่
               setTimeout(() => {
                 setScanStatus('idle');
-                // ไม่ต้อง reload ทั้งหน้า แค่เริ่มสแกนใหม่ก็พอ (หรือจะ reload ก็ได้ตามใจชอบครับ)
-                // window.location.reload(); 
               }, 2000);
             }
           },
@@ -79,7 +85,7 @@ export default function ScanPage() {
         scannerRef.current.stop().then(() => scannerRef.current?.clear()).catch(() => {});
       }
     };
-  }, [scanStatus]); // รันใหม่เมื่อ scanStatus กลับมาเป็น idle
+  }, [scanStatus]);
 
   return (
     <div className="min-h-screen bg-[#F8FAFC] flex flex-col items-center py-10 px-4">
@@ -98,10 +104,8 @@ export default function ScanPage() {
 
         <Card className="border-none shadow-xl rounded-3xl overflow-hidden bg-white">
           <CardContent className="p-0 relative bg-black flex flex-col items-center justify-center min-h-[400px]">
-            {/* กล้องจะแสดงที่นี่ */}
             <div id="reader" className="w-full h-full" />
             
-            {/* 1. Overlay โหลดกล้องตอนแรก */}
             {hasPermission === null && scanStatus === 'idle' && (
               <div className="absolute inset-0 bg-slate-900 flex flex-col items-center justify-center text-white z-10">
                 <Loader2 className="animate-spin mb-4" size={40} />
@@ -109,7 +113,6 @@ export default function ScanPage() {
               </div>
             )}
 
-            {/* 2. Overlay สแกนสำเร็จ (สีเขียว) */}
             {scanStatus === 'success' && (
               <div className="absolute inset-0 bg-emerald-600 flex flex-col items-center justify-center text-white z-20 animate-in fade-in zoom-in duration-300">
                 <div className="w-20 h-20 bg-white/20 rounded-full flex items-center justify-center mb-4 backdrop-blur-sm">
@@ -123,7 +126,6 @@ export default function ScanPage() {
               </div>
             )}
 
-            {/* 3. Overlay สแกนผิด (สีแดง) */}
             {scanStatus === 'error' && (
               <div className="absolute inset-0 bg-red-600 flex flex-col items-center justify-center text-white z-20 animate-in fade-in zoom-in duration-300">
                 <div className="w-20 h-20 bg-white/20 rounded-full flex items-center justify-center mb-4 backdrop-blur-sm">
