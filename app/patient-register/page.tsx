@@ -2,13 +2,16 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Save, Loader2, CheckCircle, ShieldAlert, PhoneCall, Camera, User } from "lucide-react";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { 
+  Save, Loader2, CheckCircle, ShieldAlert, PhoneCall, 
+  Camera, User, ChevronLeft, Activity, HeartPulse, Globe2
+} from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-
 
 export default function PublicRegistrationPage() {
   const router = useRouter();
@@ -27,26 +30,22 @@ export default function PublicRegistrationPage() {
     medicalDevices: "",
     emergencyContactName: "",
     emergencyContactPhone: "",
-    profileImage: "" // 🟢 เพิ่ม State สำหรับเก็บรูปภาพ (Base64)
+    profileImage: "" 
   });
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  // 🟢 ฟังก์ชันจัดการเมื่อผู้ใช้อัปโหลดรูป
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
-      // เช็คขนาดไฟล์ไม่ให้เกิน 2MB 
       if (file.size > 2 * 1024 * 1024) {
         alert("ขนาดไฟล์รูปภาพต้องไม่เกิน 2MB ครับ");
         return;
       }
-      
       const reader = new FileReader();
       reader.onloadend = () => {
-        // แปลงรูปเป็น Base64 แล้วเก็บลง State
         setFormData({ ...formData, profileImage: reader.result as string });
       };
       reader.readAsDataURL(file);
@@ -56,15 +55,8 @@ export default function PublicRegistrationPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
-    
     try {
-      /* 🟢 ตรงนี้เรียกใช้ API หรือ Server Action ของคุณ
-        ข้อมูล formData ตอนนี้จะมี profileImage ที่เป็น String (Base64) ส่งไปด้วยแล้ว
-      */
-      
-      // ตัวอย่างการจำลองการบันทึกข้อมูล
       await new Promise(resolve => setTimeout(resolve, 1500));
-      
       setIsSuccess(true);
     } catch (error) {
       alert("เกิดข้อผิดพลาดในการบันทึกข้อมูล กรุณาลองใหม่อีกครั้ง");
@@ -72,210 +64,212 @@ export default function PublicRegistrationPage() {
       setIsSubmitting(false);
     }
   };
-
-  // 🌟 หน้าจอเมื่อบันทึกข้อมูลสำเร็จ
+  
   if (isSuccess) {
     return (
       <div className="min-h-screen bg-[#F8FAFC] flex flex-col items-center justify-center p-4 font-sans">
-        <div className="bg-white p-10 rounded-[2rem] shadow-xl max-w-md w-full text-center space-y-5 border border-slate-100">
-          <div className="w-24 h-24 bg-emerald-50 rounded-full flex items-center justify-center mx-auto mb-2">
+        <div className="bg-white p-10 rounded-[3rem] shadow-2xl shadow-slate-200 max-w-md w-full text-center space-y-6 border border-slate-50">
+          <div className="w-24 h-24 bg-emerald-50 rounded-[2rem] flex items-center justify-center mx-auto mb-2 shadow-inner">
             <CheckCircle size={48} className="text-emerald-500" />
           </div>
-          <h2 className="text-3xl font-black text-slate-800 tracking-tight">ลงทะเบียนสำเร็จ!</h2>
-          <p className="text-slate-500 font-medium leading-relaxed text-sm">
-            ข้อมูลสุขภาพฉุกเฉินของคุณถูกบันทึกเข้าสู่ระบบกลางแล้ว<br/>หากเกิดเหตุฉุกเฉิน ทีมแพทย์และกู้ภัยจะสามารถดึงข้อมูลนี้ไปช่วยเหลือคุณได้ทันที
-          </p>
-          <div className="pt-4">
-            <Button onClick={() => router.push('/')} className="w-full bg-blue-600 hover:bg-blue-700 h-14 rounded-2xl font-bold text-base shadow-lg shadow-blue-200 transition-all active:scale-95">
-              กลับสู่หน้าหลัก
-            </Button>
+          <div className="space-y-2">
+            <h2 className="text-3xl font-black text-slate-800 tracking-tight">ลงทะเบียนสำเร็จ!</h2>
+            <p className="text-slate-500 font-medium leading-relaxed">
+              ข้อมูลของคุณถูกบันทึกเข้าสู่ระบบ Careequal แล้ว ทีมกู้ภัยจะสามารถช่วยเหลือคุณได้ทันทีเมื่อเกิดเหตุ
+            </p>
           </div>
+          <Button onClick={() => router.push('/')} className="w-full bg-blue-600 hover:bg-blue-700 h-16 rounded-2xl font-black text-lg shadow-xl shadow-blue-100 transition-all active:scale-95">
+            กลับสู่หน้าหลัก
+          </Button>
         </div>
       </div>
     );
   }
 
-  // 🌟 หน้าจอแบบฟอร์มลงทะเบียน
   return (
-    <div className="min-h-screen bg-[#F8FAFC] pb-12 font-sans">
-      {/* Navbar สำหรับประชาชน */}
-      <nav className="bg-white border-b border-slate-200 sticky top-0 z-10 shadow-sm">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 flex h-16 items-center">
-          <div className="flex items-center ">
-             <img className=" mt-2 h-28 w-auto object-contain" src="/logo/logo.png" alt="CareEqual Logo" />
+    <div className="min-h-screen bg-[#F8FAFC] pb-20 font-sans">
+      
+      {/* 🧭 Navbar พร้อมปุ่มย้อนกลับด้านซ้าย และ Logo ตรงกลาง */}
+      <nav className="bg-white border-b border-slate-200 sticky top-0 z-50 shadow-sm">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex justify-between h-16 items-center relative">
+          
+          {/* ปุ่มย้อนกลับด้านซ้าย */}
+          <div className="flex items-center z-20">
+            <Link 
+              href="/" 
+              className="p-2 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-xl transition-all group"
+            >
+              <ChevronLeft size={24} className="group-hover:-translate-x-1 transition-transform" />
+            </Link>
           </div>
+
+          {/* โลโก้ตรงกลางเป๊ะ */}
+          <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+            <img className="h-26 w-auto object-contain pointer-events-auto" src="/logo/logo.png" alt="CareEqual Logo" />
+          </div>
+
+          {/* ส่วนว่างด้านขวาเพื่อให้โลโก้สมดุล */}
+          <div className="w-10 z-20"></div>
         </div>
       </nav>
 
-      <main className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 pt-8">
-        <div className="mb-8 text-center sm:text-left">
-          <h1 className="text-3xl font-black text-slate-800">ลงทะเบียนข้อมูลแพทย์ฉุกเฉิน</h1>
-          <p className="text-slate-500 font-medium mt-2 text-sm sm:text-base">
-            กรุณากรอกข้อมูลตามความเป็นจริง เพื่อประโยชน์สูงสุดในการรักษาพยาบาลยามฉุกเฉิน
+      <main className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 pt-12">
+        
+        {/* หัวข้อหน้า */}
+        <div className="text-center mb-12">
+          <div className="inline-flex items-center gap-2 bg-blue-50 text-blue-600 px-4 py-1.5 rounded-full text-xs font-black uppercase tracking-widest mb-4">
+          </div>
+          <h1 className="text-4xl font-black text-slate-800 tracking-tight">ลงทะเบียนข้อมูลฉุกเฉิน</h1>
+          <p className="text-slate-500 font-medium mt-2 max-w-lg mx-auto text-balance">
+            สร้างประวัติสุขภาพดิจิทัลของคุณ เพื่อการเข้าถึงการรักษาที่รวดเร็วและเท่าเทียม
           </p>
         </div>
 
-        <form onSubmit={handleSubmit} className="space-y-6">
+        <form onSubmit={handleSubmit} className="space-y-8">
           
-          {/* 🌟 Section ใหม่: อัปโหลดรูปโปรไฟล์ */}
-          <div className="flex flex-col items-center justify-center mb-8 pt-4">
-            <div className="relative group cursor-pointer">
-              <div className="w-32 h-32 rounded-full border-4 border-white shadow-xl bg-slate-50 flex items-center justify-center overflow-hidden transition-all group-hover:border-blue-100">
+          {/* 🌟 Section: อัปโหลดรูปโปรไฟล์ */}
+          <div className="flex flex-col items-center justify-center pb-4">
+            <div className="relative group">
+              <div className="w-36 h-36 rounded-[2.5rem] border-4 border-white shadow-2xl bg-white flex items-center justify-center overflow-hidden transition-all group-hover:border-blue-50">
                 {formData.profileImage ? (
                   <img src={formData.profileImage} alt="Profile" className="w-full h-full object-cover" />
                 ) : (
-                  <User size={48} className="text-slate-300" />
+                  <User size={56} className="text-slate-200" />
                 )}
               </div>
-              
-              {/* ปุ่มกล้องถ่ายรูปทับซ้อนอยู่ด้านบน */}
-              <label className="absolute bottom-0 right-0 w-10 h-10 bg-blue-600 rounded-full border-4 border-white shadow-sm flex items-center justify-center cursor-pointer hover:bg-blue-700 transition-colors">
-                <Camera size={16} className="text-white" />
-                <input 
-                  type="file" 
-                  accept="image/jpeg, image/png, image/webp" 
-                  className="hidden" 
-                  onChange={handleImageUpload} 
-                />
+              <label className="absolute -bottom-2 -right-2 w-12 h-12 bg-blue-600 rounded-2xl border-4 border-white shadow-lg flex items-center justify-center cursor-pointer hover:bg-blue-700 hover:scale-110 transition-all active:scale-95">
+                <Camera size={20} className="text-white" />
+                <input type="file" accept="image/*" className="hidden" onChange={handleImageUpload} />
               </label>
             </div>
-            <p className="text-xs font-bold text-slate-400 mt-4 uppercase tracking-widest">
-              รูปถ่ายหน้าตรง (ไม่เกิน 2MB)
-            </p>
+            <p className="text-[10px] font-black text-slate-400 mt-6 uppercase tracking-[0.2em]">รูปถ่ายหน้าตรง (ไม่เกิน 2MB)</p>
           </div>
 
           {/* 🟦 หมวดที่ 1: ข้อมูลส่วนตัวพื้นฐาน */}
-            <Card className="border-none shadow-sm rounded-3xl overflow-hidden">
-             <CardHeader className="bg-blue-50/50 border-b border-blue-100 px-6 py-4 flex flex-row items-center gap-3">
-                <div className="p-2.5 bg-blue-50 text-blue-600 rounded-xl"><User size={22} /></div>
-                <CardTitle className="text-xl font-bold text-slate-800">ข้อมูลระบุตัวตนพื้นฐาน</CardTitle>
-              </CardHeader>
-              <CardContent className="bg-white pt-8 grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6">
+          <Card className="border-none shadow-xl shadow-blue-100 rounded-[2.5rem] overflow-hidden border-2 border-blue-50">
+            <CardHeader className="bg-white/50 border-b border-slate-50 p-8 flex flex-row items-center gap-4">
+              <div className="p-3 bg-blue-50 text-blue-600 rounded-2xl shadow-sm"><User size={24} /></div>
+              <CardTitle className="text-2xl font-black text-slate-800">ข้อมูลระบุตัวตน</CardTitle>
+            </CardHeader>
+            <CardContent className="p-8 grid grid-cols-1 md:grid-cols-2 gap-x-10 gap-y-8 bg-white">
+              <div className="space-y-2">
+                <Label className="font-black text-slate-400 text-[10px] uppercase tracking-widest ml-1">ชื่อ-นามสกุล</Label>
+                <Input name="fullName" required className="h-14 bg-slate-50/50 rounded-2xl border-slate-100 text-lg font-bold px-5 focus:ring-4 focus:ring-blue-500/5 transition-all" placeholder="นายใจดี ยินดีช่วย" />
+              </div>
+              <div className="space-y-2">
+                <Label className="font-black text-slate-400 text-[10px] uppercase tracking-widest ml-1">เลขประจำตัวประชาชน (13 หลัก)</Label>
+                <Input name="idCard" maxLength={13} required className="h-14 bg-slate-50/50 rounded-2xl border-slate-100 text-lg font-mono font-bold px-5 focus:ring-4 focus:ring-blue-500/5 transition-all" placeholder="1234567890123" />
+              </div>
+              <div className="space-y-2">
+                <Label className="font-black text-slate-400 text-[10px] uppercase tracking-widest ml-1">เบอร์โทรศัพท์</Label>
+                <Input name="phoneNumber" maxLength={10} className="h-14 bg-slate-50/50 rounded-2xl border-slate-100 text-lg font-mono font-bold px-5 focus:ring-4 focus:ring-blue-500/5 transition-all" placeholder="08XXXXXXXX" />
+              </div>
+              <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <Label className="font-bold text-slate-600 ml-1">ชื่อ-นามสกุล</Label>
-                  <Input name="fullName" required className="w-full h-14 bg-slate-50 rounded-xl border-none text-lg px-4 focus:ring-2 focus:ring-blue-100 transition-all" placeholder="เช่น นายสมชาย รักดี" />
+                  <Label className="font-black text-slate-400 text-[10px] uppercase tracking-widest ml-1">อายุ (ปี)</Label>
+                  <Input name="age" type="number" required className="h-14 bg-slate-50/50 rounded-2xl border-slate-100 text-lg font-bold px-5" placeholder="45" />
                 </div>
                 <div className="space-y-2">
-                  <Label className="font-bold text-slate-600 ml-1">เลขประจำตัวประชาชน (13 หลัก)</Label>
-                  <Input name="idCard" type="text" maxLength={13} required className="w-full h-14 bg-slate-50 rounded-xl border-none text-lg font-mono px-4 focus:ring-2 focus:ring-blue-100 transition-all" placeholder="1234567890123" />
-                </div>
-                
-                {/* 🟢 ส่วนที่เพิ่มใหม่: เบอร์โทร และ ที่อยู่ */}
-                <div className="space-y-2">
-                  <Label className="font-bold text-slate-600 ml-1">เบอร์โทรศัพท์ผู้ป่วย</Label>
-                  <Input name="phoneNumber" type="tel" maxLength={10} className="w-full h-14 bg-slate-50 rounded-xl border-none text-lg px-4 focus:ring-2 focus:ring-blue-100 transition-all font-mono" placeholder="08XXXXXXXX" />
-                </div>
-                <div className="space-y-2 md:col-span-2">
-                  <Label className="font-bold text-slate-600 ml-1">ที่อยู่ปัจจุบัน</Label>
-                  <Input name="address" className="w-full h-14 bg-slate-50 rounded-xl border-none text-lg px-4 focus:ring-2 focus:ring-blue-100 transition-all" placeholder="บ้านเลขที่, หมู่, ซอย, ถนน, ตำบล, อำเภอ, จังหวัด, รหัสไปรษณีย์" />
-                </div>
-
-                <div className="space-y-2">
-                  <Label className="font-bold text-slate-600 ml-1">อายุ (ปี)</Label>
-                  <Input name="age" type="number" required className="w-full h-14 bg-slate-50 rounded-xl border-none text-lg px-4 focus:ring-2 focus:ring-blue-100 transition-all" placeholder="เช่น 45" />
-                </div>
-                <div className="space-y-2">
-                  <Label className="font-bold text-slate-600 ml-1">เพศ</Label>
+                  <Label className="font-black text-slate-400 text-[10px] uppercase tracking-widest ml-1">เพศ</Label>
                   <Select name="gender" defaultValue="ชาย">
-                    <SelectTrigger className="w-full h-14 bg-slate-50 border-0 rounded-xl text-lg px-4 focus:ring-2 focus:ring-blue-100 focus:ring-offset-0">
+                    <SelectTrigger className="h-14 bg-slate-50/50 border-slate-100 rounded-2xl text-lg font-bold px-5">
                       <SelectValue placeholder="เลือกเพศ" />
                     </SelectTrigger>
-                    <SelectContent className="rounded-xl shadow-lg border-none bg-white">
-                      <SelectItem value="ชาย" className="cursor-pointer">ชาย</SelectItem>
-                      <SelectItem value="หญิง" className="cursor-pointer">หญิง</SelectItem>
-                      <SelectItem value="อื่นๆ" className="cursor-pointer">อื่นๆ</SelectItem>
+                    <SelectContent className="rounded-2xl border-none shadow-2xl">
+                      <SelectItem value="ชาย">ชาย</SelectItem>
+                      <SelectItem value="หญิง">หญิง</SelectItem>
+                      <SelectItem value="อื่นๆ">อื่นๆ</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
-
-                {/* 🟢 ส่วนที่เพิ่มใหม่: เชื้อชาติ, สัญชาติ, ศาสนา */}
+              </div>
+              <div className="space-y-2 md:col-span-2">
+                <Label className="font-black text-slate-400 text-[10px] uppercase tracking-widest ml-1">ที่อยู่ตามทะเบียนบ้าน/ปัจจุบัน</Label>
+                <Input name="address" className="h-14 bg-slate-50/50 rounded-2xl border-slate-100 text-lg font-bold px-5" placeholder="ระบุข้อมูลที่อยู่ที่กู้ภัยสามารถติดต่อได้" />
+              </div>
+              <div className="grid grid-cols-3 gap-4 md:col-span-2">
+                <div className="space-y-2"><Label className="font-black text-slate-400 text-[10px] uppercase tracking-widest">เชื้อชาติ</Label><Input name="race" defaultValue="ไทย" className="h-14 bg-slate-50/50 rounded-2xl border-slate-100 font-bold" /></div>
+                <div className="space-y-2"><Label className="font-black text-slate-400 text-[10px] uppercase tracking-widest">สัญชาติ</Label><Input name="nationality" defaultValue="ไทย" className="h-14 bg-slate-50/50 rounded-2xl border-slate-100 font-bold" /></div>
                 <div className="space-y-2">
-                  <Label className="font-bold text-slate-600 ml-1">เชื้อชาติ</Label>
-                  <Input name="race" defaultValue="ไทย" className="w-full h-14 bg-slate-50 rounded-xl border-none text-lg px-4 focus:ring-2 focus:ring-blue-100 transition-all" placeholder="เช่น ไทย" />
-                </div>
-                <div className="space-y-2">
-                  <Label className="font-bold text-slate-600 ml-1">สัญชาติ</Label>
-                  <Input name="nationality" defaultValue="ไทย" className="w-full h-14 bg-slate-50 rounded-xl border-none text-lg px-4 focus:ring-2 focus:ring-blue-100 transition-all" placeholder="เช่น ไทย" />
-                </div>
-                <div className="space-y-2 md:col-span-2">
-                  <Label className="font-bold text-slate-600 ml-1">ศาสนา</Label>
+                  <Label className="font-black text-slate-400 text-[10px] uppercase tracking-widest ml-1">ศาสนา</Label>
                   <Select name="religion" defaultValue="พุทธ">
-                    <SelectTrigger className="w-full h-14 bg-slate-50 border-0 rounded-xl text-lg px-4 focus:ring-2 focus:ring-blue-100 focus:ring-offset-0">
-                      <SelectValue placeholder="เลือกศาสนา" />
+                    <SelectTrigger className="h-14 bg-slate-50/50 border-slate-100 rounded-2xl font-bold px-5">
+                      <SelectValue />
                     </SelectTrigger>
-                    <SelectContent className="rounded-xl shadow-lg border-none bg-white">
-                      <SelectItem value="พุทธ" className="cursor-pointer">พุทธ</SelectItem>
-                      <SelectItem value="คริสต์" className="cursor-pointer">คริสต์</SelectItem>
-                      <SelectItem value="อิสลาม" className="cursor-pointer">อิสลาม</SelectItem>
-                      <SelectItem value="พราหมณ์-ฮินดู" className="cursor-pointer">พราหมณ์-ฮินดู</SelectItem>
-                      <SelectItem value="ซิกข์" className="cursor-pointer">ซิกข์</SelectItem>
-                      <SelectItem value="ไม่มีศาสนา" className="cursor-pointer">ไม่มีศาสนา</SelectItem>
+                    <SelectContent className="rounded-2xl border-none shadow-2xl">
+                      <SelectItem value="พุทธ">พุทธ</SelectItem>
+                      <SelectItem value="คริสต์">คริสต์</SelectItem>
+                      <SelectItem value="อิสลาม">อิสลาม</SelectItem>
+                      <SelectItem value="ไม่มีศาสนา">ไม่มีศาสนา</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
-              </CardContent>
-            </Card>
-
-          {/* Section 2: ข้อมูลการแพทย์ */}
-          <Card className="border-none shadow-sm rounded-3xl bg-white overflow-hidden">
-            <CardHeader className="bg-red-50/50 border-b border-red-100 px-6 py-4 flex flex-row items-center gap-3">
-              <div className="w-8 h-8 bg-red-100 text-red-600 rounded-lg flex items-center justify-center">
-                <ShieldAlert size={18} />
-              </div>
-              <CardTitle className="text-lg font-black text-red-900">ประวัติการแพ้ และโรคประจำตัว</CardTitle>
-            </CardHeader>
-            <CardContent className="p-6 grid grid-cols-1 md:grid-cols-2 gap-5">
-              <div className="space-y-2">
-                <label className="text-[11px] font-black text-slate-500 uppercase tracking-widest">ประวัติการแพ้ยา / แพ้อาหาร</label>
-                <input name="allergies" value={formData.allergies} onChange={handleChange} className="w-full bg-slate-50 border-2 border-slate-100 rounded-xl h-12 px-4 outline-none focus:border-red-500 focus:bg-white transition-all font-bold text-slate-800 placeholder-slate-400" placeholder="ระบุการแพ้ หรือ 'ปฏิเสธการแพ้'" />
-              </div>
-              <div className="space-y-2">
-                <label className="text-[11px] font-black text-slate-500 uppercase tracking-widest">โรคประจำตัว</label>
-                <input name="underlying" value={formData.underlying} onChange={handleChange} className="w-full bg-slate-50 border-2 border-slate-100 rounded-xl h-12 px-4 outline-none focus:border-red-500 focus:bg-white transition-all font-bold text-slate-800 placeholder-slate-400" placeholder="เช่น เบาหวาน, ความดันสูง หรือ '-'" />
-              </div>
-              <div className="space-y-2">
-                <label className="text-[11px] font-black text-slate-500 uppercase tracking-widest">ยาที่ใช้ประจำ</label>
-                <input name="medications" value={formData.medications} onChange={handleChange} className="w-full bg-slate-50 border-2 border-slate-100 rounded-xl h-12 px-4 outline-none focus:border-red-500 focus:bg-white transition-all font-bold text-slate-800 placeholder-slate-400" placeholder="ระบุชื่อยา หรือ '-'" />
-              </div>
-              <div className="space-y-2">
-                <label className="text-[11px] font-black text-slate-500 uppercase tracking-widest">อุปกรณ์การแพทย์ในร่างกาย</label>
-                <input name="medicalDevices" value={formData.medicalDevices} onChange={handleChange} className="w-full bg-slate-50 border-2 border-slate-100 rounded-xl h-12 px-4 outline-none focus:border-red-500 focus:bg-white transition-all font-bold text-slate-800 placeholder-slate-400" placeholder="เช่น เครื่องกระตุ้นหัวใจ, โลหะดามกระดูก หรือ '-'" />
               </div>
             </CardContent>
           </Card>
 
-          {/* Section 3: ติดต่อฉุกเฉิน */}
-          <Card className="border-none shadow-sm rounded-3xl bg-white overflow-hidden">
-            <CardHeader className="bg-emerald-50/50 border-b border-emerald-100 px-6 py-4 flex flex-row items-center gap-3">
-              <div className="w-8 h-8 bg-emerald-100 text-emerald-600 rounded-lg flex items-center justify-center">
-                <PhoneCall size={18} />
+          {/* 🟥 หมวดที่ 2: ข้อมูลการแพทย์ฉุกเฉิน */}
+          <Card className="border-none shadow-xl shadow-red-100 rounded-[2.5rem] overflow-hidden border-2 border-red-50">
+            <CardHeader className="bg-red-50/30 border-b border-red-50 p-8 flex flex-row items-center gap-4">
+              <div className="p-3 bg-red-100 text-red-600 rounded-2xl shadow-sm"><ShieldAlert size={24} /></div>
+              <div>
+                <CardTitle className="text-2xl font-black text-slate-800 tracking-tight">ประวัติสุขภาพฉุกเฉิน</CardTitle>
+                <CardDescription className="text-red-600 font-bold">ข้อมูลส่วนนี้จะปรากฏทันทีเมื่อกู้ภัยทำการสแกน</CardDescription>
               </div>
-              <CardTitle className="text-lg font-black text-emerald-900">ผู้ติดต่อยามฉุกเฉิน</CardTitle>
             </CardHeader>
-            <CardContent className="p-6 grid grid-cols-1 md:grid-cols-2 gap-5">
+            <CardContent className="p-8 grid grid-cols-1 md:grid-cols-2 gap-x-10 gap-y-8 bg-white">
               <div className="space-y-2">
-                <label className="text-[11px] font-black text-slate-500 uppercase tracking-widest">ชื่อผู้ติดต่อฉุกเฉิน *</label>
-                <input required name="emergencyContactName" value={formData.emergencyContactName} onChange={handleChange} className="w-full bg-slate-50 border-2 border-slate-100 rounded-xl h-12 px-4 outline-none focus:border-emerald-500 focus:bg-white transition-all font-bold text-slate-800" placeholder="ระบุชื่อ และความสัมพันธ์" />
+                <Label className="font-black text-slate-400 text-[10px] uppercase tracking-widest ml-1">กรุ๊ปเลือด (Blood Type)</Label>
+                <Input name="bloodType" required className="h-14 bg-red-50/20 border-none rounded-2xl text-xl font-black text-red-600 uppercase px-5" placeholder="เช่น O POSITIVE" />
               </div>
               <div className="space-y-2">
-                <label className="text-[11px] font-black text-slate-500 uppercase tracking-widest">เบอร์โทรศัพท์ติดต่อฉุกเฉิน *</label>
-                <input required name="emergencyContactPhone" value={formData.emergencyContactPhone} onChange={(e) => setFormData({ ...formData, emergencyContactPhone: e.target.value.replace(/[^0-9-]/g, "") })} className="w-full bg-slate-50 border-2 border-slate-100 rounded-xl h-12 px-4 outline-none focus:border-emerald-500 focus:bg-white transition-all font-bold text-slate-800" placeholder="08X-XXX-XXXX" />
+                <Label className="font-black text-red-600 text-[10px] uppercase tracking-widest ml-1 flex items-center gap-2">ประวัติการแพ้ยา/แพ้อาหารรุนแรง</Label>
+                <Input name="allergies" value={formData.allergies} onChange={handleChange} className="h-14 bg-red-50 border-none rounded-2xl text-lg font-black text-red-700 px-5" placeholder="ระบุสิ่งที่แพ้ หรือ 'ปฏิเสธการแพ้'" />
+              </div>
+              <div className="space-y-2">
+                <Label className="font-black text-slate-400 text-[10px] uppercase tracking-widest ml-1">โรคประจำตัว</Label>
+                <Input name="underlying" value={formData.underlying} onChange={handleChange} className="h-14 bg-slate-50 border-none rounded-2xl text-lg font-bold px-5" placeholder="เบาหวาน, ความดันสูง, โรคหัวใจ ฯลฯ" />
+              </div>
+              <div className="space-y-2">
+                <Label className="font-black text-slate-400 text-[10px] uppercase tracking-widest ml-1">ยาที่ใช้เป็นประจำ</Label>
+                <Input name="medications" value={formData.medications} onChange={handleChange} className="h-14 bg-slate-50 border-none rounded-2xl text-lg font-bold px-5" placeholder="ระบุชื่อยาที่คุณต้องทานทุกวัน" />
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* 🟩 หมวดที่ 3: ผู้ติดต่อฉุกเฉิน */}
+          <Card className="border-none shadow-xl shadow-emerald-100 rounded-[2.5rem] overflow-hidden">
+            <CardHeader className="bg-emerald-50/30 border-b border-emerald-50 p-8 flex flex-row items-center gap-4">
+              <div className="p-3 bg-emerald-100 text-emerald-600 rounded-2xl shadow-sm"><PhoneCall size={24} /></div>
+              <CardTitle className="text-2xl font-black text-slate-800">ผู้ติดต่อยามฉุกเฉิน (ญาติ)</CardTitle>
+            </CardHeader>
+            <CardContent className="p-8 grid grid-cols-1 md:grid-cols-2 gap-x-10 gap-y-8 bg-white">
+              <div className="space-y-2">
+                <Label className="font-black text-slate-400 text-[10px] uppercase tracking-widest ml-1">ชื่อผู้ติดต่อและสถานะ (ญาติ)</Label>
+                <Input required name="emergencyContactName" value={formData.emergencyContactName} onChange={handleChange} className="h-14 bg-slate-50 border-none rounded-2xl text-lg font-bold px-5" placeholder="นายสมรัก (บิดา)" />
+              </div>
+              <div className="space-y-2">
+                <Label className="font-black text-slate-400 text-[10px] uppercase tracking-widest ml-1">เบอร์โทรศัพท์ (ติดต่อด่วน)</Label>
+                <Input required name="emergencyContactPhone" value={formData.emergencyContactPhone} onChange={(e) => setFormData({ ...formData, emergencyContactPhone: e.target.value.replace(/[^0-9-]/g, "") })} className="h-14 bg-slate-50 border-none rounded-2xl text-xl font-black text-emerald-700 font-mono px-5" placeholder="08X-XXX-XXXX" />
               </div>
             </CardContent>
           </Card>
 
           {/* Submit Button */}
-          <div className="pt-4 pb-12">
-            <Button type="submit" disabled={isSubmitting} className="w-full bg-blue-600 hover:bg-blue-700 h-16 rounded-[2rem] font-black text-lg shadow-xl shadow-blue-200 transition-all active:scale-95 gap-3">
-              {isSubmitting ? <Loader2 className="animate-spin" size={24} /> : <Save size={24} />}
-              บันทึกข้อมูลเข้าสู่ระบบกลาง Careequal
+          <div className="pt-8 text-center">
+            <Button 
+              type="submit" 
+              disabled={isSubmitting} 
+              className="w-full h-20 bg-blue-600 hover:bg-blue-700 rounded-[2rem] font-black text-2xl shadow-2xl shadow-blue-200 transition-all active:scale-[0.98] gap-4"
+            >
+              {isSubmitting ? <Loader2 className="animate-spin" size={32} /> : <Save size={32} />}
+              บันทึกข้อมูลสุขภาพดิจิทัล
             </Button>
-            <p className="text-center text-xs font-bold text-slate-400 mt-4 uppercase tracking-widest">
-              ข้อมูลของคุณจะถูกรักษาเป็นความลับ และใช้เพื่อการแพทย์ฉุกเฉินเท่านั้น
+            <p className="text-[10px] font-black text-slate-300 mt-6 uppercase tracking-[0.3em]">
+              Careequal Security Standard &copy; 2026
             </p>
           </div>
         </form>
-
       </main>
     </div>
   );

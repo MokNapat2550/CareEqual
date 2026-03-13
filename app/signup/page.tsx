@@ -11,7 +11,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import BackButton from "@/components/BackButton";
-import { UserPlus, ShieldCheck, Lock, UserCircle, Truck, Stethoscope, Building2, Phone, Loader2 } from "lucide-react";
+import { UserPlus, ShieldCheck, Lock, UserCircle, Building2, Phone, Loader2 } from "lucide-react";
 
 export default function SignupPage() {
   const router = useRouter();
