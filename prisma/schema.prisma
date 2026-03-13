@@ -1,0 +1,73 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+enum Role {
+  DOCTOR
+  NURSE
+  RESCUER
+}
+
+// ==========================================
+// ตารางที่ 1: ข้อมูลเจ้าหน้าที่ (Users)
+// ==========================================
+model User {
+  id           String    @id @default(uuid())
+  username     String    @unique
+  password     String
+  role         Role
+  fullName     String?
+  licenseId    String?
+  organization String?
+  phone        String?
+  createdAt    DateTime  @default(now())
+  
+  // ความสัมพันธ์: เจ้าหน้าที่ 1 คน สามารถลงทะเบียนผู้ป่วยได้หลายคน
+  patients     Patient[] 
+}
+
+// ==========================================
+// ตารางที่ 2: ข้อมูลผู้ป่วยฉุกเฉิน (Patients)
+// ==========================================
+model Patient {
+  imageUrl     String?   @db.Text
+  profileImage          String?
+  id                    String   @id @default(uuid())
+  qrToken               String   @unique @default(uuid()) 
+  fullName              String   // ชื่อ-นามสกุล
+  idCard                String   @unique // เลขบัตรประชาชน 13 หลัก
+  age                   Int      // อายุ
+  gender                String   // เพศ
+  phoneNumber           String?
+  address               String?
+  race                  String?
+  nationality           String?
+  religion              String?             
+  // --- หมวดที่ 2: ข้อมูลวิกฤตทางการแพทย์ ---
+  bloodType             String   // กรุ๊ปเลือด (เช่น O+, AB-)
+  allergies             String?  // ประวัติแพ้ยา/อาหาร (ใส่ ? เพราะบางคนอาจไม่แพ้อะไรเลย)
+  underlying            String?  // โรคประจำตัว (เช่น เบาหวาน, ความดัน)
+  medications           String?  // ยาที่ทานประจำ (เช่น ยาละลายลิ่มเลือด)
+  medicalDevices        String?  // อุปกรณ์ในร่างกาย (เช่น Pacemaker เครื่องกระตุ้นหัวใจ)
+
+  // --- หมวดที่ 3: ข้อมูลติดต่อฉุกเฉิน ---
+  emergencyContactName  String   // ชื่อญาติ
+  emergencyContactPhone String   // เบอร์โทรญาติ
+
+  // --- Metadata: การรับรองข้อมูล ---
+  // เชื่อมโยงว่า "เจ้าหน้าที่คนไหน" เป็นคนลงนามรับรองข้อมูลชุดนี้
+  creatorId             String
+  creator               User     @relation(fields: [creatorId], references: [id])
+  
+  createdAt             DateTime @default(now())
+  updatedAt             DateTime @updatedAt
+}
+
+
+
