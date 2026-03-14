@@ -1,8 +1,8 @@
 import { prisma } from "@/lib/prisma";
 import { 
   Activity, Droplet, User, Phone, Pill, 
- HeartPulse, ShieldAlert, MapPin, IdCard, 
-  ChevronLeft , Heart, BookHeart
+  HeartPulse, ShieldAlert, MapPin, IdCard, 
+  ChevronLeft, Heart, BookHeart
 } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import Link from "next/link";
@@ -38,7 +38,13 @@ export default async function EmergencyProfilePage({ params }: { params: Promise
     );
   }
 
-  const hasAllergies = patient.allergies && patient.allergies !== "ปฏิเสธการแพ้ยา" && patient.allergies !== "-" && patient.allergies !== "";
+  // 🟢 Logic ตรวจสอบการแพ้ยาแบบละเอียด
+  const hasAllergies = patient.allergies && 
+                       patient.allergies.trim() !== "" && 
+                       patient.allergies !== "ปฏิเสธการแพ้ยา" && 
+                       patient.allergies !== "-" && 
+                       patient.allergies !== "ไม่มี" &&
+                       patient.allergies !== "ไม่แพ้";
 
   return (
     <div className="min-h-screen bg-slate-100 font-sans pb-12 relative">
@@ -52,58 +58,49 @@ export default async function EmergencyProfilePage({ params }: { params: Promise
         <span className="text-sm font-bold hidden md:inline">ย้อนกลับ</span>
       </Link>
 
-      {/* 🟦 Header ส่วนบน: จัด Layout ใหม่ให้รองรับจอใหญ่และสมดุลบนมือถือ */}
+      {/* 🟩 Header ส่วนบน: เปลี่ยนเป็นสีเขียว Emerald */}
       <div className="bg-emerald-500 w-full pt-20 md:pt-16 pb-28 md:pb-36 px-4 md:px-12 rounded-b-[3rem] md:rounded-b-[5rem] shadow-lg relative overflow-hidden flex justify-center">
-        {/* แสงวงกลมตกแต่ง */}
         <div className="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full -mr-20 -mt-20 blur-3xl pointer-events-none" />
         <div className="absolute bottom-0 left-0 w-40 h-40 bg-black/10 rounded-full -ml-10 -mb-10 blur-2xl pointer-events-none" />
         
         <div className="max-w-5xl w-full flex flex-col md:flex-row items-center justify-between relative z-10">
           
-          {/* 📱 โลโก้สำหรับมือถือ (แสดงเฉพาะจอมือถือ จัดให้อยู่ตรงกลางบนสุด) */}
           <div className="flex md:hidden w-full justify-center mb-6">
              <img className="h-30 w-auto object-contain opacity-90 drop-shadow-sm" src="/logo/logo6.png" alt="CareEqual Logo" />
           </div>
 
-          {/* ข้อมูลโปรไฟล์ (ซ้ายบนจอใหญ่ / กลางบนมือถือ) */}
           <div className="flex flex-col md:flex-row items-center md:items-start gap-4 md:gap-8 md:mt-8">
-            {/* รูปโปรไฟล์ */}
             {patient.imageUrl ? (
               <div className="w-32 h-32 md:w-40 md:h-40 rounded-[2.5rem] border-4 border-white shadow-2xl overflow-hidden bg-white shrink-0">
                 <img src={patient.imageUrl} alt="Profile" className="w-full h-full object-cover" />
               </div>
             ) : (
-              <div className="w-28 h-28 md:w-36 md:h-36 rounded-[2rem] border-4 border-white/30 bg-red-700 flex items-center justify-center shrink-0 shadow-inner">
-                <User size={60} className="text-red-200" />
+              <div className="w-28 h-28 md:w-36 md:h-36 rounded-[2rem] border-4 border-white/30 bg-emerald-700 flex items-center justify-center shrink-0 shadow-inner">
+                <User size={60} className="text-emerald-200" />
               </div>
             )}
 
-            {/* ชื่อและรหัส */}
             <div className="text-center md:text-left flex flex-col justify-center mt-2 md:mt-4">
               <h1 className="text-2xl md:text-4xl lg:text-5xl font-black tracking-wide uppercase text-white drop-shadow-md text-balance">
                 {patient.fullName}
               </h1>
               <div className="mt-3 flex justify-center md:justify-start">
-                <p className="text-red-100 font-bold flex items-center gap-2 bg-black/20 px-4 py-1.5 rounded-full text-sm shadow-inner backdrop-blur-sm">
+                <p className="text-emerald-50 font-bold flex items-center gap-2 bg-black/20 px-4 py-1.5 rounded-full text-sm shadow-inner backdrop-blur-sm">
                   <IdCard size={18}/> {patient.idCard}
                 </p>
               </div>
             </div>
           </div>
 
-          {/* 💻 โลโก้สำหรับจอใหญ่ (แสดงเฉพาะจอใหญ่ อยู่ขวามือ) */}
           <div className="hidden md:flex flex-col items-end shrink-0">
              <img className="h-24 lg:h-40 w-auto object-contain drop-shadow-lg" src="/logo/logo6.png" alt="CareEqual Logo" />
           </div>
-
         </div>
       </div>
 
-      {/* 📦 Main Content: ปรับเป็น Grid System สำหรับ Responsive */}
       <div className="max-w-5xl mx-auto px-4 -mt-16 md:-mt-20 relative z-10">
         <div className="grid grid-cols-1 md:grid-cols-12 gap-5 md:gap-6">
           
-          {/* 🟥 กรุ๊ปเลือด และ อายุ */}
           <div className="md:col-span-5 lg:col-span-4 grid grid-cols-2 gap-4">
             <Card className="border-none shadow-xl rounded-[2.5rem] bg-white overflow-hidden hover:shadow-2xl transition-shadow">
               <CardContent className="p-5 flex flex-col items-center justify-center text-center h-full">
@@ -121,26 +118,29 @@ export default async function EmergencyProfilePage({ params }: { params: Promise
             </Card>
           </div>
 
-          {/* 🚨 ข้อมูลแพ้ยา */}
-          <Card className={`md:col-span-7 lg:col-span-8 border-none shadow-xl rounded-[2.5rem] overflow-hidden flex flex-col justify-center ${hasAllergies ? 'bg-red-600 text-white' : 'bg-red-500 text-white'}`}>
+          {/* 🚨 ข้อมูลแพ้ยา: จะเปลี่ยนสีตามสถานะ hasAllergies */}
+          <Card className={`md:col-span-7 lg:col-span-8 border-none shadow-xl rounded-[2.5rem] overflow-hidden flex flex-col justify-center transition-all duration-500 ${
+            hasAllergies ? 'bg-red-600 text-white animate-pulse' : 'bg-emerald-500 text-white'
+          }`}>
             <CardContent className="p-6 md:p-8 flex flex-col justify-center h-full">
               <div className="flex items-center gap-2 mb-3">
                 <ShieldAlert size={26} />
-                <h3 className="font-black text-sm md:text-base uppercase tracking-wider opacity-90">ประวัติแพ้ยา (Allergies)</h3>
+                <h3 className="font-black text-sm md:text-base uppercase tracking-wider opacity-90">
+                  {hasAllergies ? "คำเตือน: ประวัติแพ้ยา (Allergies)" : "ข้อมูลความปลอดภัยทางการแพทย์"}
+                </h3>
               </div>
               <p className="text-2xl md:text-3xl lg:text-4xl font-black leading-snug py-2 md:py-0">
-                {patient.allergies || "ไม่พบข้อมูล"}
+                {patient.allergies || "ไม่พบข้อมูลประวัติการแพ้ยา"}
               </p>
             </CardContent>
           </Card>
 
-          {/* 🏥 รายละเอียดการแพทย์ */}
           <Card className="md:col-span-6 border-none shadow-xl rounded-[2.5rem] bg-white overflow-hidden">
             <CardContent className="p-7 space-y-6">
               <div className="flex gap-4">
                 <div className="p-3 md:p-4 bg-orange-50 text-orange-500 rounded-2xl h-fit shadow-sm"><BookHeart size={24} /></div>
                 <div>
-                  <h3 className="font-black text-[11px] md:text-xs text-slate-400 uppercase tracking-widest mb-1">โรคประจำตัว</h3>
+                  <h3 className="font-black text-[11px] md:text-xs text-slate-400 uppercase tracking-widest mb-1">โรคประจำตัว (Underlying)</h3>
                   <p className="text-lg md:text-xl font-bold text-slate-800 leading-snug">{patient.underlying || "-"}</p>
                 </div>
               </div>
@@ -160,7 +160,6 @@ export default async function EmergencyProfilePage({ params }: { params: Promise
             </CardContent>
           </Card>
 
-          {/* 📍 ข้อมูลส่วนตัวและที่อยู่ */}
           <Card className="md:col-span-6 border-none shadow-xl rounded-[2.5rem] bg-white overflow-hidden">
             <CardContent className="p-7 space-y-6">
               <div className="flex gap-4">
@@ -179,7 +178,6 @@ export default async function EmergencyProfilePage({ params }: { params: Promise
                  </div>
               </div>
 
-              {/* แถว เชื้อชาติ สัญชาติ ศาสนา */}
               <div className="pt-6 border-t border-slate-100 grid grid-cols-3 gap-2 text-center">
                 <div>
                   <p className="text-[10px] font-bold text-slate-400 uppercase tracking-tighter">เชื้อชาติ</p>
@@ -197,7 +195,6 @@ export default async function EmergencyProfilePage({ params }: { params: Promise
             </CardContent>
           </Card>
 
-          {/* 📞 ติดต่อฉุกเฉิน: ปรับให้เต็มพื้นที่เท่าเพื่อนๆ */}
           <Card className="md:col-span-12 border-none shadow-2xl rounded-[3rem] bg-white overflow-hidden border-4 border-blue-50 mt-2">
             <CardContent className="p-6 md:p-8">
               <div className="flex items-center gap-2 mb-5 text-blue-600 justify-center">
@@ -220,12 +217,10 @@ export default async function EmergencyProfilePage({ params }: { params: Promise
           </Card>
         </div>
 
-
-        {/* Footer */}
         <div className="text-center pt-12 pb-4">
            <div className="flex items-center justify-center gap-4 mb-2 opacity-50">
               <div className="h-px w-12 bg-slate-400"></div>
-              <p className="text-[10px] font-bold text-slate-500 uppercase tracking-[0.3em]">CareEqual</p>
+              <p className="text-[10px] font-bold text-slate-500 uppercase tracking-[0.3em]">CareEqual &copy; 2026</p>
               <div className="h-px w-12 bg-slate-400"></div>
            </div>
         </div>

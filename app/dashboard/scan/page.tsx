@@ -6,7 +6,7 @@ import Link from "next/link";
 import { Html5Qrcode } from "html5-qrcode";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { ArrowLeft, Camera, ShieldAlert, Loader2, CheckCircle2, XCircle } from "lucide-react";
+import { ArrowLeft, Loader2, CheckCircle2, XCircle } from "lucide-react";
 
 export default function ScanPage() {
   const router = useRouter();
@@ -35,31 +35,29 @@ export default function ScanPage() {
           { facingMode: "environment" },
           { fps: 10, qrbox: { width: 250, height: 250 }, aspectRatio: 1.0 },
           async (decodedText) => {
-            // หยุดสแกนชั่วคราว
+            // หยุดกล้องชั่วคราวเมื่อสแกนติด
             if (scannerRef.current?.isScanning) {
               await scannerRef.current.stop();
             }
 
-            // ✅ กรณีที่ 1: QR Code ของระบบ CareEqual (ตรวจจาก /scan/)
+            // ✅ ตรวจสอบว่ามีคำว่า /scan/ ใน QR Code ไหม (เพื่อยืนยันว่าเป็นของระบบเรา)
             if (decodedText.includes('/scan/')) {
               setScanStatus('success');
               
-              // 🛡️ [จุดสำคัญ] ระบบซ่อม URL อัตโนมัติ
-              let finalUrl = decodedText;
+              // 🛡️ [โค้ดไม้ตายแก้ปัญหา 404] 
+              // ตัดข้อความเอาเฉพาะ "รหัสผู้ป่วย" ที่อยู่หลังคำว่า /scan/
+              const parts = decodedText.split('/scan/');
+              const qrToken = parts.pop()?.replace(/\//g, ''); // ดึงตัวหลังสุด และเอา / ที่อาจติดมาออก
               
-              // ถ้าสแกนเจอ localhost ให้เปลี่ยนเป็น URL ปัจจุบันที่กำลังใช้งาน (Vercel)
-              if (finalUrl.includes("localhost:3000")) {
-                const currentOrigin = window.location.origin; // จะได้ https://careequalqrcode.vercel.app
-                finalUrl = finalUrl.replace("http://localhost:3000", currentOrigin);
-                console.log("Redirecting from localhost to:", finalUrl);
-              }
+              // 🎯 บังคับใช้ URL โดเมนหลักของ Vercel เท่านั้น (ทิ้งลิงก์ Preview หรือ localhost เก่า)
+              const finalProductionUrl = `https://careequalqrcode.vercel.app/scan/${qrToken}`;
 
-              // รอ 1.5 วินาทีเพื่อให้แสดงหน้าจอ Success
+              // หน่วงเวลา 1.5 วินาทีให้เห็นหน้าสีเขียว แล้วเด้งไปที่ URL จริง
               setTimeout(() => {
-                window.location.href = finalUrl;
+                window.location.href = finalProductionUrl;
               }, 1500);
             } 
-            // ❌ กรณีที่ 2: QR Code ไม่ใช่ของระบบ
+            // ❌ กรณี QR Code ไม่ใช่ของระบบเรา
             else {
               setScanStatus('error');
               setTimeout(() => {
@@ -121,7 +119,7 @@ export default function ScanPage() {
                 <h2 className="text-2xl font-black mb-2">สแกนสำเร็จ!</h2>
                 <div className="flex items-center gap-2 text-emerald-100">
                   <Loader2 className="animate-spin" size={18} />
-                  <p className="font-medium">กำลังเปิดข้อมูลผู้ป่วย...</p>
+                  <p className="font-medium">กำลังเปิดข้อมูล...</p>
                 </div>
               </div>
             )}
