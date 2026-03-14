@@ -122,7 +122,7 @@ export default function DashboardPage() {
             .info { text-align: left; margin-top: 20px; }
             .item { display: flex; justify-content: space-between; margin-bottom: 10px; border-bottom: 1px solid #f1f5f9; padding-bottom: 5px; }
             .label { font-weight: bold; color: #64748b; font-size: 14px; }
-            .value { font-weight: 800; color: #1e293b; font-size: 16px; }
+            .value { font-weight: 800; color: #1e293b; font-size: 16px; text-align: right; max-width: 60%; }
             .alert { color: #ef4444; }
           </style>
         </head>
@@ -135,6 +135,10 @@ export default function DashboardPage() {
               <div class="item"><span class="label">กรุ๊ปเลือด</span><span class="value" style="color:#ef4444">${selectedPatient.bloodType || '-'}</span></div>
               <div class="item"><span class="label">โรคประจำตัว</span><span class="value">${selectedPatient.underlying || '-'}</span></div>
               <div class="item"><span class="label">แพ้ยา</span><span class="value alert">${selectedPatient.allergies || '-'}</span></div>
+              
+              <div class="item"><span class="label">ยาที่ใช้</span><span class="value">${selectedPatient.medications || '-'}</span></div>
+              <div class="item"><span class="label">อุปกรณ์</span><span class="value">${selectedPatient.medicalDevices || '-'}</span></div>
+              
               <div class="item"><span class="label">ติดต่อฉุกเฉิน</span><span class="value">${selectedPatient.emergencyContactPhone}</span></div>
             </div>
           </div>
@@ -270,7 +274,7 @@ export default function DashboardPage() {
                   <div className="p-6 bg-slate-50 rounded-[2.5rem] border-2 border-dashed border-slate-200 my-6">
                     <div id="qr-svg-container" className="bg-white p-4 rounded-3xl shadow-sm">
                       <QRCode 
-                        value={`${process.env.NEXT_PUBLIC_BASE_URL}/scan/${selectedPatient.qrToken}`} 
+                        value={`https://careequalqrcode.vercel.app/scan/${selectedPatient.qrToken}`} 
                         size={200} 
                         level="H" 
                       />
@@ -283,10 +287,9 @@ export default function DashboardPage() {
                 </div>
               )}
 
-              {/* --- 🟢 โหมดแสดงข้อมูลสำคัญแบบชัดเจน (พร้อม QR ด้านล่าง) --- */}
+              {/* --- โหมดแสดงรายละเอียด --- */}
               {viewMode === 'details' && (
                 <div className="flex flex-col">
-                  {/* Header: ส่วนชื่อและรูปถ่าย */}
                   <div className="bg-blue-600 p-8 text-white relative">
                     <div className="flex justify-between items-start gap-4">
                       <div className="z-10">
@@ -299,7 +302,6 @@ export default function DashboardPage() {
                     </div>
                   </div>
 
-                  {/* ⚡ Highlight Info: กรุ๊ปเลือด / อายุ / เพศ (เน้นให้ชัดเจน) */}
                   <div className="px-8 -mt-8 grid grid-cols-3 gap-3 z-20">
                     <Card className="mt-5 border-none shadow-xl rounded-[2rem] bg-white overflow-hidden text-center p-4">
                       <Droplet size={24} className="text-red-600 mx-auto mb-1" fill="currentColor" />
@@ -318,9 +320,7 @@ export default function DashboardPage() {
                     </Card>
                   </div>
 
-                  {/* Body Content */}
                   <div className="p-8 space-y-6">
-                    {/* ข้อมูลแพ้ยา (อันตรายที่สุดต้องชัด) */}
                     <div className={`p-6 rounded-[2rem] border-2 ${selectedPatient.allergies && selectedPatient.allergies !== "ปฏิเสธการแพ้ยา" ? "bg-red-50 border-red-200 text-red-700" : "bg-emerald-50 border-emerald-200 text-emerald-700"}`}>
                       <h4 className="font-black text-xs uppercase mb-1 flex items-center gap-2"><ShieldAlert size={18} /> ประวัติการแพ้ยา / แพ้อาหาร</h4>
                       <p className="text-2xl font-black py-1 leading-tight">{selectedPatient.allergies || "ไม่พบข้อมูล"}</p>
@@ -332,32 +332,37 @@ export default function DashboardPage() {
                         <p className="font-bold text-slate-800 leading-snug">{selectedPatient.underlying || "-"}</p>
                       </div>
                       <div className="bg-slate-50 p-5 rounded-[2rem] border border-slate-100">
+                        <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">ยาที่ใช้ / อุปกรณ์</p>
                         <p className="font-bold text-slate-800 leading-snug">{selectedPatient.medications || "-"}</p>
+                        
+                        {/* 🟢 เพิ่มการแสดงผลอุปกรณ์ (Medical Devices) ที่เคยหายไป */}
+                        {selectedPatient.medicalDevices && selectedPatient.medicalDevices !== "-" && (
+                          <div className="mt-3 flex items-center gap-2 text-blue-700 font-bold text-sm bg-blue-100/50 px-4 py-2 rounded-xl w-fit">
+                            {selectedPatient.medicalDevices}
+                          </div>
+                        )}
                       </div>
                     </div>
 
-                    {/* ข้อมูลที่อยู่ และเบอร์โทร */}
                     <div className="bg-slate-50 p-6 rounded-[2.5rem] space-y-4 border border-slate-100 shadow-inner">
                       <div className="flex gap-4"><PhoneCall size={18} className="text-blue-500" /><div><p className="text-[10px] font-black text-slate-400 uppercase">เบอร์โทรศัพท์ผู้ป่วย</p><p className="font-bold text-slate-800">{selectedPatient.phoneNumber || "-"}</p></div></div>
                       <div className="flex gap-4"><MapPin size={18} className="text-blue-500" /><div><p className="text-[10px] font-black text-slate-400 uppercase">ที่อยู่ปัจจุบัน</p><p className="text-sm font-bold text-slate-800 leading-relaxed">{selectedPatient.address || "-"}</p></div></div>
                     </div>
 
-                    {/* 📞 ติดต่อฉุกเฉิน (คลิกเพื่อโทรได้เลย) */}
                     <a href={`tel:${selectedPatient.emergencyContactPhone}`} className="block bg-blue-600 p-6 rounded-[2rem] text-white hover:bg-blue-700 transition-all shadow-xl shadow-blue-100 text-center">
                       <p className="text-[10px] font-black uppercase opacity-70 mb-1 tracking-widest">เบอร์ติดต่อฉุกเฉิน</p>
                       <p className="text-xl font-black mb-1">{selectedPatient.emergencyContactName}</p>
                       <p className="text-2xl font-black flex items-center justify-center gap-3"><PhoneCall size={24} fill="currentColor"/> {selectedPatient.emergencyContactPhone}</p>
                     </a>
 
-                    {/* 🏁 ส่วนท้าย: QR Code ประจำตัวผู้ป่วย (พร้อมปุ่มพิมพ์ทันที) */}
                     <div className="mt-8 pt-8 border-t-2 border-dashed border-slate-100 flex flex-col items-center bg-slate-50/50 rounded-[3rem] p-8">
                       <div className="flex items-center gap-2 mb-4 text-slate-400">
                         <QrCode size={20} />
                         <p className="text-xs font-black uppercase tracking-widest">Careequal Patient QR</p>
                       </div>
-                      <div id="qr-svg-container" className="bg-white p-5 rounded-3xl shadow-xl border-4 border-white mb-6">
+                      <div id="qr-svg-container-details" className="bg-white p-5 rounded-3xl shadow-xl border-4 border-white mb-6">
                         <QRCode 
-                          value={`${process.env.NEXT_PUBLIC_BASE_URL}/scan/${selectedPatient.qrToken}`} 
+                          value={`https://careequalqrcode.vercel.app/scan/${selectedPatient.qrToken}`} 
                           size={160} 
                           level="H" 
                         />
